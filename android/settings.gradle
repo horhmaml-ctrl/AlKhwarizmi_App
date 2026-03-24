@@ -1,18 +1,23 @@
-include ':app'
+pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        return flutterSdkPath
+    }()
 
-def flutterRoot = System.getenv('FLUTTER_ROOT')
-if (flutterRoot == null) {
-    // محاولة إيجاد المسار إذا لم يكن معرفاً كمتغير بيئة
-    def localProperties = new Properties()
-    def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
-    if (localPropertiesFile.exists()) {
-        localPropertiesFile.withReader('UTF-8') { reader ->
-            localProperties.load(reader)
-        }
-        flutterRoot = localProperties.getProperty('flutter.sdk')
+    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
     }
 }
 
-if (flutterRoot != null) {
-    apply from: "$flutterRoot/packages/flutter_tools/gradle/app_plugin_loader.gradle"
+plugins {
+    id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
 }
+
+include ":app"
